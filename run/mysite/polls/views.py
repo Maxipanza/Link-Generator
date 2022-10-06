@@ -35,23 +35,25 @@ class ResultsView(generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
 
-
 def vote_http(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
     try:
         choice_id = request.POST['choice']
         vote(question_id, choice_id)
+    except(KeyError, Question.DoesNotExist):
+        return render(request, 'polls/detail.html', {
+            'question': question_id,
+            'error_message': "Pregunta incorrecta",
+            })
     except(KeyError, Choice.DoesNotExist):
-            return render(request, 'polls/detail.html', {
-                'question': question,
-                'error_message': "No seleccionaste una choice",
+        return render(request, 'polls/detail.html', {
+            'question': question_id,
+            'error_message': "No seleccionaste una choice",
             })
     else:
-
         #selected_choice.votes += 1
-        
+        question = Question.objects.get(pk=question_id)
         return HttpResponseRedirect(reverse('polls:results', args=(question_id,)))
-
+        
 def vote(question_id, choice_id):
     question = Question.objects.get(pk=question_id)
     selected_choice = question.choice_set.get(pk=choice_id)
