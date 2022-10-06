@@ -1,4 +1,6 @@
 from re import template
+from select import select
+from typing_extensions import Self
 from django.http import HttpResponse, HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import get_object_or_404,render
@@ -34,19 +36,30 @@ class ResultsView(generic.DetailView):
     template_name = 'polls/results.html'
 
 
-def vote(request, question_id):
+def vote_http(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
-        selected_choice = question.choice_set.get(pk=request.POST['choice'])
+        choice_id = request.POST['choice']
+        vote(question_id, choice_id)
     except(KeyError, Choice.DoesNotExist):
             return render(request, 'polls/detail.html', {
                 'question': question,
                 'error_message': "No seleccionaste una choice",
             })
     else:
-        selected_choice.votes += 1
-        selected_choice.save()
+
+        #selected_choice.votes += 1
+        
         return HttpResponseRedirect(reverse('polls:results', args=(question_id,)))
 
+def vote(question_id, choice_id):
+    question = Question.objects.get(pk=question_id)
+    selected_choice = question.choice_set.get(pk=choice_id)
+    selected_choice.votes += 1
+    selected_choice.save()
 
-
+def vote_commandline():
+    question_id = None  #leer de la linea de comando
+    choice_id = None  #leer de la linea de comando
+    vote(question_id, choice_id)
+    print("algopiolaparaelusuario")

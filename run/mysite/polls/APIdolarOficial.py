@@ -1,4 +1,6 @@
 from itertools import count
+import json
+from urllib import response
 import requests
 from requests.exceptions import HTTPError
 
@@ -49,6 +51,32 @@ class claseDolar:
             if (key != "last_update" and key == "blue"):
                 return int(value['value_avg'])
 
+
+
+class apiFer:
+    def __init__(self):
+        self.url = "http://181.97.199.115:25565/"
+    def postVal(self):
+        valor=input("ingrese valor a enviar:")
+        try:
+            payload = json.dumps(valor)
+            headers = {
+  'Content-Type': 'application/json'
+}
+            response = requests.request("POST", self.url, headers=headers, data=payload)
+            response.raise_for_status()
+            print(response)
+        
+        except HTTPError as http_err: 
+            print(f'HTTP error occurred: {http_err}')
+        except Exception as err:
+            print(f'Other error occurred: {err}')
+
+
+
+
+
+apiFer().postVal()
 
 #print(claseDolar().blue())
 #print(claseDolar().oficial())
